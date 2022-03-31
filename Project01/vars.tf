@@ -3,9 +3,13 @@ variable "ssh_key" {
   }
   
 variable "proxmox_host" {
-	default = "Zeus"
+	default = "hera"
   }
   
 variable "template_name" {
-	default = "ubuntu_cloud"
+	default = "ubuntu-img"
   }
+
+variable "token-key" {
+  default = "3b15656a-d0c2-4746-9d08-1d5481b44407"
+}

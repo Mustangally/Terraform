@@ -11,20 +11,21 @@ terraform {
   provider "proxmox" {
     pm_api_url = "https://proxmox.local.kkovach.com/api2/json"
     pm_api_token_id = "terraform@pam!terraform_token"
-    pm_api_token_secret = "ENTER SECRET HERE"
+    pm_api_token_secret = "${var.token-key}"
   }
   
 # now we can start to build our VM
-  resource "proxmox_vm_qemu" "test_VM" {
+  resource "proxmox_vm_qemu" "ubuntu_VM" {
     count = 1
-    name = "test-VM-${count.index + 1}" #this is going to index the VM created with a number based on a counter variable.
+    name = "ubuntu-VM-${count.index + 1}" #this is going to index the VM created with a number based on a counter variable.
     
     # we're going to start pointing to our vars file for the following attributes
     target_node = var.proxmox_host
     clone = var.template_name
     
     #now i'll set the VM specs
-    agent = 1
+    agent = 0
+    # define_connection_info = false
     os_type = "cloud-init"
     cores = 4
     sockets = 1
@@ -32,17 +33,18 @@ terraform {
     memory = "4096"
     scsihw = "virtio-scsi-pci"
     bootdisk = "scsi0"
+    balloon = 0
     
     disk {
       slot = 0
-      size = "32G"
+      size = "32GB"
       type = "scsi"
-      storage = "SSD"
+      storage = "RUN"
       iothread = 1
     }
     
     #we can set the IP here, and we can use the same counter variable to set an IP.
-    ipconfig0 = "ip=10.0.0.11${count.index +1}/24,gw=10.0.0.1"
+    ipconfig0 = "ip=10.0.0.12${count.index +1}/24,gw=10.0.0.1"
     
     #include your SSH keys so you can SSH into the new server right from the start. We'll use another variable there.
     sshkeys = <<EOF
